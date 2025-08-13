@@ -1,0 +1,44 @@
+{
+  "name": "@roaddirect/ngx-google-maps-autocomplete",
+  "description": "Autocomplete input component and directive for google-maps built with angular and material design",
+  "version": "17.0.0",
+  "homepage": "https://github.com/RoadDirectLtd/ngx-google-maps-autocomplete",
+  "author": {
+    "name": "Daniel Stocker (from Anthony Nahas)",
+    "url": "https://github.com/roaddirect-development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RoadDirectLtd/ngx-google-maps-autocomplete"
+  },
+  "license": "MIT",
+  "schematics": "./schematics/collection.json",
+  "keywords": [
+    "angular",
+    "material design",
+    "google maps",
+    "autocomplete",
+    "places",
+    "locations",
+    "parse",
+    "street name",
+    "location",
+    "country",
+    "city"
+  ],
+  "peerDependencies": {
+    "@angular/cdk": "^17.x",
+    "@angular/common": "^17.x",
+    "@angular/core": "^17.x",
+    "@angular/platform-browser": "^17.x",
+    "@ngbracket/ngx-layout": "^17.0.0",
+    "@angular/forms": "^17.x",
+    "@angular/material": "^17.x",
+    "@types/google.maps": "^3.58.1",
+    "rxjs": "^7.x",
+    "zone.js": "~0.14.x"
+  },
+  "engines": {
+    "node": ">=18.19.3"
+  }
+}
