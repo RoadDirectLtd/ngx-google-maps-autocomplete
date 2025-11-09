@@ -23,8 +23,6 @@ import {
   Validators,
 } from "@angular/forms";
 import { Location } from "../interfaces";
-import { ScriptLoaderService } from "../services/script-loader.service";
-import { ApiKeyToken } from "../tokens";
 import PlaceResult = google.maps.places.PlaceResult;
 import AutocompleteOptions = google.maps.places.AutocompleteOptions;
 
@@ -98,11 +96,8 @@ export class MatGoogleMapsAutocompleteDirective
 
   constructor(
     @Inject(PLATFORM_ID) public platformId: string,
-    @Inject(ApiKeyToken)
-    public apiKey: string,
     public elemRef: ElementRef,
     private cf: ChangeDetectorRef,
-    private loaderService: ScriptLoaderService,
     private ngZone: NgZone
   ) { }
 
@@ -113,7 +108,7 @@ export class MatGoogleMapsAutocompleteDirective
   }
 
   ngAfterViewInit(): void {
-    this.loadMap();
+    this.initMap();
   }
 
   ngOnInit(): void { }
@@ -128,34 +123,11 @@ export class MatGoogleMapsAutocompleteDirective
     this.value = value;
   }
 
-  public initGoogleMapsAutocomplete() {
-    const autocomplete = new google.maps.places.Autocomplete(
-      this.elemRef.nativeElement,
-      this.autoCompleteOptions
-    );
-    autocomplete.addListener("place_changed", () => {
-      this.ngZone.run(() => {
-        // get the place result
-        const place: PlaceResult = autocomplete.getPlace();
-
-        this.value = place.formatted_address;
-        this.address = place.formatted_address;
-        this.onAutocompleteSelected.emit(place);
-        if (place.geometry?.location != null) {
-          this.onLocationSelected.emit({
-            latitude: place.geometry.location.lat(),
-            longitude: place.geometry.location.lng(),
-          });
-        }
-      });
-    });
-  }
-
   registerOnChange(fn: any): void {
     this.propagateChange = fn;
   }
 
-  registerOnTouched(fn: any): void { }
+  registerOnTouched(_fn: any): void { }
 
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
@@ -167,23 +139,8 @@ export class MatGoogleMapsAutocompleteDirective
     }
   }
 
-  loadMap(): void {
-    this.loaderService
-      .loadScript(
-        `https://maps.googleapis.com/maps/api/js?key=${this.apiKey}&libraries=places`
-      )
-      .then(() => {
-        this.initMap();
-      })
-      .catch((error) => console.error("Google Maps loading failed: ", error));
-  }
-
   initMap() {
     if (isPlatformBrowser(this.platformId)) {
-      this.autocomplete = new google.maps.places.Autocomplete(
-        this.elemRef.nativeElement
-      );
-
       const options: AutocompleteOptions = {
         // types: ['address'],
         // componentRestrictions: {country: this.country},
@@ -203,7 +160,28 @@ export class MatGoogleMapsAutocompleteDirective
         this.autoCompleteOptions,
         options
       );
-      this.initGoogleMapsAutocomplete();
+
+      const autocomplete = new google.maps.places.Autocomplete(
+        this.elemRef.nativeElement,
+        this.autoCompleteOptions
+      );
+      this.autocomplete = autocomplete;
+      autocomplete.addListener("place_changed", () => {
+        this.ngZone.run(() => {
+          // get the place result
+          const place: PlaceResult = autocomplete.getPlace();
+
+          this.value = place.formatted_address;
+          this.address = place.formatted_address;
+          this.onAutocompleteSelected.emit(place);
+          if (place.geometry?.location != null) {
+            this.onLocationSelected.emit({
+              latitude: place.geometry.location.lat(),
+              longitude: place.geometry.location.lng(),
+            });
+          }
+        });
+      });
     }
   }
 }
